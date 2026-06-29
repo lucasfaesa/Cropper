@@ -248,7 +248,7 @@
       const img = images[activeIdx];
       if (!img.complete || !img.naturalWidth) { img.onload = drawPreview; return; }
       const maxW = canvas.parentElement.clientWidth;
-      const maxH = Math.min(480, window.innerHeight * 0.55);
+      const maxH = Math.min(720, window.innerHeight * 0.8);
       scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
       const dw = Math.round(img.naturalWidth * scale);
       const dh = Math.round(img.naturalHeight * scale);
@@ -395,15 +395,18 @@
       drag = { mode: 'draw', x0: mx, y0: my };
     });
 
-    canvas.addEventListener('mousemove', e => {
+    window.addEventListener('mousemove', e => {
       const r  = canvas.getBoundingClientRect();
       const mx = e.clientX - r.left, my = e.clientY - r.top;
 
       if (!drag) {
+        // cursor feedback only when over the canvas
+        const onCanvas = mx >= 0 && mx <= canvas.width && my >= 0 && my <= canvas.height;
+        if (!onCanvas) return;
         const handle = hitHandle(mx, my);
-        if (handle)           canvas.style.cursor = handle.cursor;
+        if (handle)                  canvas.style.cursor = handle.cursor;
         else if (insideCrop(mx, my)) canvas.style.cursor = 'move';
-        else                  canvas.style.cursor = 'crosshair';
+        else                         canvas.style.cursor = 'crosshair';
         return;
       }
 
@@ -465,7 +468,7 @@
       ctx.setLineDash([]);
     });
 
-    canvas.addEventListener('mouseup', e => {
+    window.addEventListener('mouseup', e => {
       if (!drag) return;
       const r  = canvas.getBoundingClientRect();
       const mx = e.clientX - r.left, my = e.clientY - r.top;
