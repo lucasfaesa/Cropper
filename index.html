@@ -30,7 +30,6 @@
     h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 6px; }
     .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 28px; }
 
-    /* Drop zone */
     #dropzone {
       border: 2px dashed var(--border);
       border-radius: 12px;
@@ -46,85 +45,68 @@
     #dropzone strong { color: var(--text); }
     #fileInput { display: none; }
 
-    /* Layout: canvas left, file list right */
-    #workspace {
-      display: none;
-      gap: 16px;
-    }
+    #workspace { display: none; gap: 16px; }
     #workspace.visible { display: grid; grid-template-columns: 1fr 280px; }
     @media (max-width: 640px) {
       #workspace.visible { grid-template-columns: 1fr; }
     }
 
-    /* Canvas */
     #canvasWrap {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       line-height: 0;
-      position: relative;
     }
-    #preview {
-      display: block;
-      width: 100%;
-      cursor: crosshair;
-    }
+    #preview { display: block; width: 100%; cursor: crosshair; }
+
     #cropInfo {
-      padding: 10px 14px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.4;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 9px 14px; font-size: 0.8rem; color: var(--muted); line-height: 1.4;
+      border-top: 1px solid var(--border);
     }
-    #cropInputRow { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-    .crop-field { display: flex; align-items: center; gap: 6px; }
+    #cropHint { flex: 1; }
+    #cropInputRow { display: none; gap: 12px; align-items: center; flex-wrap: wrap; }
+    #cropInputRow.visible { display: flex; }
+    .crop-field { display: flex; align-items: center; gap: 5px; }
     .crop-field input[type=number] {
-      width: 72px; background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); border-radius: 6px; padding: 4px 8px;
-      font-size: 0.82rem; font-family: inherit; outline: none;
+      width: 64px; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 3px 7px;
+      font-size: 0.8rem; font-family: inherit; outline: none;
       -moz-appearance: textfield;
     }
     .crop-field input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
     .crop-field input[type=number]:focus { border-color: var(--accent); }
+    .square-toggle {
+      display: flex; align-items: center; gap: 6px;
+      cursor: pointer; white-space: nowrap; margin-left: auto;
+    }
+    .square-toggle input { accent-color: var(--accent); cursor: pointer; }
 
-    /* Sidebar */
     .sidebar { display: flex; flex-direction: column; gap: 12px; }
     .sidebar h2 { font-size: 0.95rem; color: var(--muted); font-weight: 500; }
     #fileList {
-      flex: 1;
-      overflow-y: auto;
-      max-height: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      flex: 1; overflow-y: auto; max-height: 420px;
+      display: flex; flex-direction: column; gap: 6px;
     }
     .file-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      border: 1px solid transparent;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2); border-radius: 8px; padding: 8px 10px;
+      font-size: 0.8rem; cursor: pointer; border: 1px solid transparent;
       transition: border-color 0.15s;
     }
     .file-item.active { border-color: var(--accent); }
-    .thumb { width: 36px; height: 36px; object-fit: contain; border-radius: 4px; flex-shrink: 0;
-      background: repeating-conic-gradient(#2a2a2a 0% 25%, #1a1a1a 0% 50%) 0 0 / 10px 10px; }
+    .thumb {
+      width: 36px; height: 36px; object-fit: contain; border-radius: 4px; flex-shrink: 0;
+      background: repeating-conic-gradient(#2a2a2a 0% 25%, #1a1a1a 0% 50%) 0 0 / 10px 10px;
+    }
     .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
 
-    /* Toolbar */
-    .toolbar { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+    .toolbar { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
     button {
-      padding: 9px 18px;
-      border-radius: 8px;
-      border: none;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: opacity 0.15s, background 0.15s;
-      font-family: inherit;
+      padding: 9px 18px; border-radius: 8px; border: none;
+      font-size: 0.875rem; cursor: pointer;
+      transition: opacity 0.15s, background 0.15s; font-family: inherit;
     }
     button:disabled { opacity: 0.4; cursor: default; }
     .btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
@@ -132,7 +114,6 @@
     .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-ghost:not(:disabled):hover { color: var(--text); border-color: #444; }
 
-    /* Progress */
     #progressWrap { display: none; margin-top: 16px; }
     #progressWrap .label { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
     .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; }
@@ -157,14 +138,18 @@
         <canvas id="preview"></canvas>
         <div id="cropInfo">
           <span id="cropHint">No region selected — click and drag to draw one</span>
-          <div id="cropInputRow" style="display:none">
+          <div id="cropInputRow">
             <div class="crop-field"><label>X</label><input type="number" id="inX" min="0" step="1"></div>
             <div class="crop-field"><label>Y</label><input type="number" id="inY" min="0" step="1"></div>
-            <div class="crop-field"><label>Size</label><input type="number" id="inSize" min="4" step="1"></div>
+            <div class="crop-field"><label>W</label><input type="number" id="inW" min="1" step="1"></div>
+            <div class="crop-field"><label>H</label><input type="number" id="inH" min="1" step="1"></div>
           </div>
+          <label class="square-toggle">
+            <input type="checkbox" id="squareCheck"> Square
+          </label>
         </div>
       </div>
-      <div class="toolbar" style="margin-top:12px;">
+      <div class="toolbar">
         <button class="btn-primary" id="applyBtn" disabled>Apply Crop to All &amp; Download ZIP</button>
         <button class="btn-ghost"   id="resetBtn" disabled>Reset</button>
       </div>
@@ -183,25 +168,42 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script>
-    const dropzone  = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const workspace = document.getElementById('workspace');
-    const canvas    = document.getElementById('preview');
-    const ctx       = canvas.getContext('2d');
-    const cropInfo  = document.getElementById('cropInfo');
-    const applyBtn  = document.getElementById('applyBtn');
-    const resetBtn  = document.getElementById('resetBtn');
-    const fileList  = document.getElementById('fileList');
-    const fileCount = document.getElementById('fileCount');
+    const dropzone   = document.getElementById('dropzone');
+    const fileInput  = document.getElementById('fileInput');
+    const workspace  = document.getElementById('workspace');
+    const canvas     = document.getElementById('preview');
+    const ctx        = canvas.getContext('2d');
+    const applyBtn   = document.getElementById('applyBtn');
+    const resetBtn   = document.getElementById('resetBtn');
+    const fileList   = document.getElementById('fileList');
+    const fileCount  = document.getElementById('fileCount');
+    const cropHint   = document.getElementById('cropHint');
+    const cropInputRow = document.getElementById('cropInputRow');
+    const inX = document.getElementById('inX');
+    const inY = document.getElementById('inY');
+    const inW = document.getElementById('inW');
+    const inH = document.getElementById('inH');
+    const squareCheck = document.getElementById('squareCheck');
 
-    let files = [];
-    let images = [];       // HTMLImageElement[]
-    let activeIdx = 0;
-    let scale = 1, offsetX = 0, offsetY = 0;
+    let files = [], images = [], activeIdx = 0;
+    let scale = 1;
     let drag = null;
-    let crop = null;       // {x,y,w,h} in image coords
+    let crop = null;       // { x, y, w, h } in image coords
+    let squareLocked = false;
 
-    // Drop zone
+    // 8 resize handles: ax/ay = fraction of crop width/height (0, 0.5, or 1)
+    const HANDLES = [
+      { id: 'nw', cursor: 'nw-resize', ax: 0,   ay: 0,   mL: true,  mR: false, mT: true,  mB: false },
+      { id: 'n',  cursor: 'n-resize',  ax: 0.5, ay: 0,   mL: false, mR: false, mT: true,  mB: false },
+      { id: 'ne', cursor: 'ne-resize', ax: 1,   ay: 0,   mL: false, mR: true,  mT: true,  mB: false },
+      { id: 'w',  cursor: 'w-resize',  ax: 0,   ay: 0.5, mL: true,  mR: false, mT: false, mB: false },
+      { id: 'e',  cursor: 'e-resize',  ax: 1,   ay: 0.5, mL: false, mR: true,  mT: false, mB: false },
+      { id: 'sw', cursor: 'sw-resize', ax: 0,   ay: 1,   mL: true,  mR: false, mT: false, mB: true  },
+      { id: 's',  cursor: 's-resize',  ax: 0.5, ay: 1,   mL: false, mR: false, mT: false, mB: true  },
+      { id: 'se', cursor: 'se-resize', ax: 1,   ay: 1,   mL: false, mR: true,  mT: false, mB: true  },
+    ];
+
+    // ---- Drop zone ----
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
@@ -241,6 +243,7 @@
       drawPreview();
     }
 
+    // ---- Canvas drawing ----
     function drawPreview() {
       const img = images[activeIdx];
       if (!img.complete || !img.naturalWidth) { img.onload = drawPreview; return; }
@@ -249,88 +252,141 @@
       scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
       const dw = Math.round(img.naturalWidth * scale);
       const dh = Math.round(img.naturalHeight * scale);
-      canvas.width = dw;
-      canvas.height = dh;
-      offsetX = 0; offsetY = 0;
+      canvas.width = dw; canvas.height = dh;
 
-      // checkerboard for transparency
-      const size = 14;
-      for (let y = 0; y < dh; y += size) {
-        for (let x = 0; x < dw; x += size) {
-          ctx.fillStyle = ((x / size + y / size) % 2 === 0) ? '#2a2a2a' : '#1a1a1a';
-          ctx.fillRect(x, y, size, size);
+      const sz = 14;
+      for (let y = 0; y < dh; y += sz)
+        for (let x = 0; x < dw; x += sz) {
+          ctx.fillStyle = ((x / sz + y / sz) % 2 === 0) ? '#2a2a2a' : '#1a1a1a';
+          ctx.fillRect(x, y, sz, sz);
         }
-      }
       ctx.drawImage(img, 0, 0, dw, dh);
-
-      if (crop) drawCropRect();
+      if (crop) drawCropOverlay();
     }
 
-    function drawCropRect() {
-      if (!crop) return;
+    function drawCropOverlay() {
       const { x, y, w, h } = crop;
       const cx = x * scale, cy = y * scale, cw = w * scale, ch = h * scale;
-      ctx.strokeStyle = '#4f8ef7';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([5, 4]);
-      ctx.strokeRect(cx + 0.5, cy + 0.5, cw, ch);
-      ctx.setLineDash([]);
-      // dim outside
+
+      // dim
       ctx.fillStyle = 'rgba(0,0,0,0.45)';
       ctx.fillRect(0, 0, canvas.width, cy);
       ctx.fillRect(0, cy, cx, ch);
       ctx.fillRect(cx + cw, cy, canvas.width - cx - cw, ch);
       ctx.fillRect(0, cy + ch, canvas.width, canvas.height - cy - ch);
+
+      // border
+      ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeRect(cx + 0.5, cy + 0.5, cw, ch);
+      ctx.setLineDash([]);
+
+      // handles
+      const HS = 7, half = HS / 2;
+      for (const h of HANDLES) {
+        const px = cx + cw * h.ax, py = cy + ch * h.ay;
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(px - half, py - half, HS, HS);
+        ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 1;
+        ctx.strokeRect(px - half, py - half, HS, HS);
+      }
     }
 
-    function toImageCoords(cx, cy) {
+    // ---- Coordinate helpers ----
+    function toImg(cx, cy) {
       return { x: Math.round(cx / scale), y: Math.round(cy / scale) };
     }
 
-    const cropHint     = document.getElementById('cropHint');
-    const cropInputRow = document.getElementById('cropInputRow');
-    const inX          = document.getElementById('inX');
-    const inY          = document.getElementById('inY');
-    const inSize       = document.getElementById('inSize');
+    function hitHandle(mx, my) {
+      if (!crop) return null;
+      const cx = crop.x * scale, cy = crop.y * scale;
+      const cw = crop.w * scale, ch = crop.h * scale;
+      const TOL = 8;
+      for (const h of HANDLES) {
+        const px = cx + cw * h.ax, py = cy + ch * h.ay;
+        if (Math.abs(mx - px) <= TOL && Math.abs(my - py) <= TOL) return h;
+      }
+      return null;
+    }
 
+    function insideCrop(mx, my) {
+      if (!crop) return false;
+      const cx = crop.x * scale, cy = crop.y * scale;
+      return mx >= cx && mx <= cx + crop.w * scale && my >= cy && my <= cy + crop.h * scale;
+    }
+
+    // Apply square constraint to a computed resize result.
+    // For corners: keep the fixed corner in place.
+    // For edges: keep the center of the perpendicular axis in place.
+    function constrainSquare(handle, snap, newX, newY, newW, newH) {
+      const side = Math.max(1, Math.min(newW, newH));
+      let rx = newX, ry = newY;
+      if      (handle.mL)              rx = newX + newW - side;   // fix right
+      else if (!handle.mR)             rx = snap.x + (snap.w - side) / 2; // N/S: center
+      if      (handle.mT)              ry = newY + newH - side;   // fix bottom
+      else if (!handle.mB)             ry = snap.y + (snap.h - side) / 2; // E/W: center
+      return { x: rx, y: ry, w: side, h: side };
+    }
+
+    // ---- Crop inputs ----
     function updateCropInputs() {
       if (!crop) {
         cropHint.style.display = '';
-        cropInputRow.style.display = 'none';
+        cropInputRow.classList.remove('visible');
         return;
       }
       cropHint.style.display = 'none';
-      cropInputRow.style.display = 'flex';
-      inX.value    = crop.x;
-      inY.value    = crop.y;
-      inSize.value = crop.w;
+      cropInputRow.classList.add('visible');
+      inX.value = Math.round(crop.x);
+      inY.value = Math.round(crop.y);
+      inW.value = Math.round(crop.w);
+      inH.value = Math.round(crop.h);
     }
 
-    [inX, inY, inSize].forEach(el => {
+    [inX, inY, inW, inH].forEach(el => {
       el.addEventListener('change', () => {
         if (!crop || !images[activeIdx]) return;
-        const img  = images[activeIdx];
-        const x    = Math.max(0, parseInt(inX.value)    || 0);
-        const y    = Math.max(0, parseInt(inY.value)    || 0);
-        const s    = Math.max(4, parseInt(inSize.value) || 4);
-        const side = Math.min(s, img.naturalWidth, img.naturalHeight);
+        const img = images[activeIdx];
+        let x = Math.max(0, parseInt(inX.value) || 0);
+        let y = Math.max(0, parseInt(inY.value) || 0);
+        let w = Math.max(1, parseInt(inW.value) || 1);
+        let h = Math.max(1, parseInt(inH.value) || 1);
+        if (squareLocked) { const s = (el === inW) ? w : h; w = h = s; }
+        w = Math.min(w, img.naturalWidth);
+        h = Math.min(h, img.naturalHeight);
         crop = {
-          x: Math.min(x, img.naturalWidth  - side),
-          y: Math.min(y, img.naturalHeight - side),
-          w: side, h: side,
+          x: Math.min(x, img.naturalWidth  - w),
+          y: Math.min(y, img.naturalHeight - h),
+          w, h,
         };
         updateCropInputs();
         drawPreview();
       });
     });
 
+    squareCheck.addEventListener('change', () => {
+      squareLocked = squareCheck.checked;
+      if (squareLocked && crop) {
+        const s = Math.min(crop.w, crop.h);
+        crop = { x: crop.x, y: crop.y, w: s, h: s };
+        updateCropInputs();
+        drawPreview();
+      }
+    });
+
+    // ---- Mouse interaction ----
     canvas.addEventListener('mousedown', e => {
-      const r  = canvas.getBoundingClientRect();
+      const r = canvas.getBoundingClientRect();
       const mx = e.clientX - r.left, my = e.clientY - r.top;
+
       if (crop) {
-        const cx = crop.x * scale, cy = crop.y * scale;
-        const cw = crop.w * scale, ch = crop.h * scale;
-        if (mx >= cx && mx <= cx + cw && my >= cy && my <= cy + ch) {
+        const handle = hitHandle(mx, my);
+        if (handle) {
+          drag = { mode: 'resize', handle, snap: { ...crop } };
+          canvas.style.cursor = handle.cursor;
+          return;
+        }
+        if (insideCrop(mx, my)) {
           drag = { mode: 'move', x0: mx, y0: my, snap: { ...crop } };
           canvas.style.cursor = 'grabbing';
           return;
@@ -344,19 +400,46 @@
       const mx = e.clientX - r.left, my = e.clientY - r.top;
 
       if (!drag) {
-        if (crop) {
-          const cx = crop.x * scale, cy = crop.y * scale;
-          const cw = crop.w * scale, ch = crop.h * scale;
-          canvas.style.cursor = (mx >= cx && mx <= cx + cw && my >= cy && my <= cy + ch)
-            ? 'move' : 'crosshair';
+        const handle = hitHandle(mx, my);
+        if (handle)           canvas.style.cursor = handle.cursor;
+        else if (insideCrop(mx, my)) canvas.style.cursor = 'move';
+        else                  canvas.style.cursor = 'crosshair';
+        return;
+      }
+
+      const img = images[activeIdx];
+
+      if (drag.mode === 'resize') {
+        const m    = toImg(mx, my);
+        const snap = drag.snap;
+        const hnd  = drag.handle;
+
+        let left   = hnd.mL ? m.x : snap.x;
+        let right  = hnd.mR ? m.x : snap.x + snap.w;
+        let top    = hnd.mT ? m.y : snap.y;
+        let bottom = hnd.mB ? m.y : snap.y + snap.h;
+
+        if (left  > right)  [left,  right]  = [right,  left];
+        if (top   > bottom) [top,   bottom] = [bottom, top];
+
+        let newX = Math.max(0, left);
+        let newY = Math.max(0, top);
+        let newW = Math.max(1, Math.min(img.naturalWidth,  right)  - newX);
+        let newH = Math.max(1, Math.min(img.naturalHeight, bottom) - newY);
+
+        if (squareLocked) {
+          ({ x: newX, y: newY, w: newW, h: newH } = constrainSquare(hnd, snap, newX, newY, newW, newH));
         }
+
+        crop = { x: Math.round(newX), y: Math.round(newY), w: Math.round(newW), h: Math.round(newH) };
+        updateCropInputs();
+        drawPreview();
         return;
       }
 
       if (drag.mode === 'move') {
-        const img = images[activeIdx];
-        const dx  = Math.round((mx - drag.x0) / scale);
-        const dy  = Math.round((my - drag.y0) / scale);
+        const dx = Math.round((mx - drag.x0) / scale);
+        const dy = Math.round((my - drag.y0) / scale);
         crop = {
           x: Math.max(0, Math.min(img.naturalWidth  - drag.snap.w, drag.snap.x + dx)),
           y: Math.max(0, Math.min(img.naturalHeight - drag.snap.h, drag.snap.y + dy)),
@@ -367,15 +450,18 @@
         return;
       }
 
-      // draw mode — square constraint
-      const dx   = mx - drag.x0, dy = my - drag.y0;
-      const side = Math.min(Math.abs(dx), Math.abs(dy));
-      const cx   = Math.min(drag.x0, drag.x0 + Math.sign(dx) * side);
-      const cy   = Math.min(drag.y0, drag.y0 + Math.sign(dy) * side);
+      // draw mode — live preview rect
+      const dx = mx - drag.x0, dy = my - drag.y0;
       drawPreview();
-      ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 1.5;
-      ctx.setLineDash([5, 4]);
-      ctx.strokeRect(cx + 0.5, cy + 0.5, side, side);
+      ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      if (squareLocked) {
+        const side = Math.min(Math.abs(dx), Math.abs(dy));
+        const cx = Math.min(drag.x0, drag.x0 + Math.sign(dx) * side);
+        const cy = Math.min(drag.y0, drag.y0 + Math.sign(dy) * side);
+        ctx.strokeRect(cx + 0.5, cy + 0.5, side, side);
+      } else {
+        ctx.strokeRect(Math.min(drag.x0, mx) + 0.5, Math.min(drag.y0, my) + 0.5, Math.abs(dx), Math.abs(dy));
+      }
       ctx.setLineDash([]);
     });
 
@@ -383,25 +469,35 @@
       if (!drag) return;
       const r  = canvas.getBoundingClientRect();
       const mx = e.clientX - r.left, my = e.clientY - r.top;
-
-      if (drag.mode === 'move') {
-        drag = null;
-        canvas.style.cursor = 'move';
-        return;
-      }
-
-      // draw mode — square, clamped to canvas bounds
-      const dx   = mx - drag.x0, dy = my - drag.y0;
-      const side = Math.min(Math.abs(dx), Math.abs(dy));
-      const cx   = Math.max(0, Math.min(drag.x0, drag.x0 + Math.sign(dx) * side));
-      const cy   = Math.max(0, Math.min(drag.y0, drag.y0 + Math.sign(dy) * side));
+      const d  = drag;
       drag = null;
 
-      const imgSide = Math.round(Math.min(side, canvas.width - cx, canvas.height - cy) / scale);
-      if (imgSide < 4) return;
+      if (d.mode === 'resize' || d.mode === 'move') return;
 
-      const p = toImageCoords(cx, cy);
-      crop = { x: p.x, y: p.y, w: imgSide, h: imgSide };
+      // draw mode — commit crop
+      const img = images[activeIdx];
+      const dx  = mx - d.x0, dy = my - d.y0;
+      let newX, newY, newW, newH;
+
+      if (squareLocked) {
+        const side = Math.min(Math.abs(dx), Math.abs(dy));
+        const cx   = Math.max(0, Math.min(d.x0, d.x0 + Math.sign(dx) * side));
+        const cy   = Math.max(0, Math.min(d.y0, d.y0 + Math.sign(dy) * side));
+        const s    = Math.round(Math.min(side, canvas.width - cx, canvas.height - cy) / scale);
+        if (s < 1) return;
+        const p = toImg(cx, cy);
+        newX = p.x; newY = p.y; newW = s; newH = s;
+      } else {
+        const cx = Math.max(0, Math.min(d.x0, mx));
+        const cy = Math.max(0, Math.min(d.y0, my));
+        const p1 = toImg(cx, cy);
+        const p2 = toImg(cx + Math.abs(dx), cy + Math.abs(dy));
+        newX = p1.x; newY = p1.y;
+        newW = p2.x - p1.x; newH = p2.y - p1.y;
+      }
+
+      if (newW < 1 || newH < 1) return;
+      crop = { x: newX, y: newY, w: newW, h: newH };
       updateCropInputs();
       applyBtn.disabled = false;
       resetBtn.disabled = false;
@@ -416,15 +512,16 @@
       drawPreview();
     });
 
+    // ---- Apply & export ----
     applyBtn.addEventListener('click', async () => {
       if (!crop) return;
       applyBtn.disabled = true;
       resetBtn.disabled = true;
 
-      const wrap    = document.getElementById('progressWrap');
-      const bar     = document.getElementById('progressBar');
-      const label   = document.getElementById('progressLabel');
-      const msg     = document.getElementById('statusMsg');
+      const wrap  = document.getElementById('progressWrap');
+      const bar   = document.getElementById('progressBar');
+      const label = document.getElementById('progressLabel');
+      const msg   = document.getElementById('statusMsg');
       wrap.style.display = 'block';
 
       const zip = new JSZip();
@@ -442,23 +539,20 @@
         const w = Math.min(crop.w, img.naturalWidth  - x);
         const h = Math.min(crop.h, img.naturalHeight - y);
 
-        const off = new OffscreenCanvas(w, h);
+        const off  = new OffscreenCanvas(w, h);
         const octx = off.getContext('2d');
         octx.drawImage(img, -x, -y);
 
         const blob = await off.convertToBlob({ type: 'image/png' });
         zip.file(files[i].name.replace(/\.[^.]+$/, '.png'), blob);
-
-        // small yield to keep UI responsive
         await new Promise(r => setTimeout(r, 0));
       }
 
       label.textContent = 'Building ZIP…';
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(zipBlob);
-      a.download = 'cropped.zip';
-      a.click();
+      Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(zipBlob), download: 'cropped.zip'
+      }).click();
 
       label.textContent = `Done — ${files.length} images cropped`;
       msg.textContent = '';
