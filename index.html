@@ -134,3 +134,248 @@
   </style>
 </head>
 <body>
+  <h1>Batch Cropper</h1>
+  <p class="sub">Draw a crop region on the preview — it applies to all images in the batch</p>
+
+  <div id="dropzone">
+    <div class="drop-icon">🗂️</div>
+    <p><strong>Drop images here</strong> or click to browse</p>
+    <p style="margin-top:6px;font-size:0.8rem;">PNG, JPG, WebP · Multiple files OK</p>
+    <input type="file" id="fileInput" multiple accept="image/*">
+  </div>
+
+  <div id="workspace">
+    <div>
+      <div id="canvasWrap">
+        <canvas id="preview"></canvas>
+        <div id="cropInfo">No region selected — click and drag to draw one</div>
+      </div>
+      <div class="toolbar" style="margin-top:12px;">
+        <button class="btn-primary" id="applyBtn" disabled>Apply Crop to All &amp; Download ZIP</button>
+        <button class="btn-ghost"   id="resetBtn" disabled>Reset</button>
+      </div>
+      <div id="progressWrap">
+        <div class="label" id="progressLabel">Processing…</div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div id="statusMsg"></div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <h2 id="fileCount"></h2>
+      <div id="fileList"></div>
+      <p style="font-size:0.78rem;color:var(--muted);">Click a file to preview it</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script>
+    const dropzone  = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const workspace = document.getElementById('workspace');
+    const canvas    = document.getElementById('preview');
+    const ctx       = canvas.getContext('2d');
+    const cropInfo  = document.getElementById('cropInfo');
+    const applyBtn  = document.getElementById('applyBtn');
+    const resetBtn  = document.getElementById('resetBtn');
+    const fileList  = document.getElementById('fileList');
+    const fileCount = document.getElementById('fileCount');
+
+    let files = [];
+    let images = [];       // HTMLImageElement[]
+    let activeIdx = 0;
+    let scale = 1, offsetX = 0, offsetY = 0;
+    let drag = null;
+    let crop = null;       // {x,y,w,h} in image coords
+
+    // Drop zone
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
+    dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('over'); loadFiles([...e.dataTransfer.files]); });
+    fileInput.addEventListener('change', () => loadFiles([...fileInput.files]));
+
+    function loadFiles(incoming) {
+      files = incoming.filter(f => f.type.startsWith('image/'));
+      if (!files.length) return;
+      images = [];
+      files.forEach((f, i) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(f);
+        images.push(img);
+        img.onload = () => { if (i === 0) showPreview(0); };
+      });
+      renderSidebar();
+      workspace.classList.add('visible');
+      dropzone.style.display = 'none';
+      fileCount.textContent = `${files.length} image${files.length > 1 ? 's' : ''}`;
+    }
+
+    function renderSidebar() {
+      fileList.innerHTML = '';
+      files.forEach((f, i) => {
+        const item = document.createElement('div');
+        item.className = 'file-item' + (i === 0 ? ' active' : '');
+        item.innerHTML = `<img class="thumb" src="${images[i].src}"><span class="file-name">${f.name}</span>`;
+        item.addEventListener('click', () => showPreview(i));
+        fileList.appendChild(item);
+      });
+    }
+
+    function showPreview(idx) {
+      activeIdx = idx;
+      fileList.querySelectorAll('.file-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+      drawPreview();
+    }
+
+    function drawPreview() {
+      const img = images[activeIdx];
+      if (!img.complete || !img.naturalWidth) { img.onload = drawPreview; return; }
+      const maxW = canvas.parentElement.clientWidth;
+      const maxH = Math.min(480, window.innerHeight * 0.55);
+      scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+      const dw = Math.round(img.naturalWidth * scale);
+      const dh = Math.round(img.naturalHeight * scale);
+      canvas.width = dw;
+      canvas.height = dh;
+      offsetX = 0; offsetY = 0;
+
+      // checkerboard for transparency
+      const size = 14;
+      for (let y = 0; y < dh; y += size) {
+        for (let x = 0; x < dw; x += size) {
+          ctx.fillStyle = ((x / size + y / size) % 2 === 0) ? '#2a2a2a' : '#1a1a1a';
+          ctx.fillRect(x, y, size, size);
+        }
+      }
+      ctx.drawImage(img, 0, 0, dw, dh);
+
+      if (crop) drawCropRect();
+    }
+
+    function drawCropRect() {
+      if (!crop) return;
+      const { x, y, w, h } = crop;
+      const cx = x * scale, cy = y * scale, cw = w * scale, ch = h * scale;
+      ctx.strokeStyle = '#4f8ef7';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeRect(cx + 0.5, cy + 0.5, cw, ch);
+      ctx.setLineDash([]);
+      // dim outside
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(0, 0, canvas.width, cy);
+      ctx.fillRect(0, cy, cx, ch);
+      ctx.fillRect(cx + cw, cy, canvas.width - cx - cw, ch);
+      ctx.fillRect(0, cy + ch, canvas.width, canvas.height - cy - ch);
+    }
+
+    function toImageCoords(cx, cy) {
+      return { x: Math.round(cx / scale), y: Math.round(cy / scale) };
+    }
+
+    canvas.addEventListener('mousedown', e => {
+      const r = canvas.getBoundingClientRect();
+      drag = { x0: e.clientX - r.left, y0: e.clientY - r.top };
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (!drag) return;
+      const r = canvas.getBoundingClientRect();
+      const x1 = e.clientX - r.left, y1 = e.clientY - r.top;
+      const img = images[activeIdx];
+      // rebuild image portion
+      drawPreview();
+      const cx = Math.min(drag.x0, x1), cy = Math.min(drag.y0, y1);
+      const cw = Math.abs(x1 - drag.x0), ch = Math.abs(y1 - drag.y0);
+      ctx.strokeStyle = '#4f8ef7'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeRect(cx + 0.5, cy + 0.5, cw, ch);
+      ctx.setLineDash([]);
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      if (!drag) return;
+      const r = canvas.getBoundingClientRect();
+      const x1 = e.clientX - r.left, y1 = e.clientY - r.top;
+      const img = images[activeIdx];
+
+      const cx1 = Math.max(0, Math.min(drag.x0, x1));
+      const cy1 = Math.max(0, Math.min(drag.y0, y1));
+      const cx2 = Math.min(canvas.width,  Math.max(drag.x0, x1));
+      const cy2 = Math.min(canvas.height, Math.max(drag.y0, y1));
+
+      const p1 = toImageCoords(cx1, cy1);
+      const p2 = toImageCoords(cx2, cy2);
+      drag = null;
+
+      if (p2.x - p1.x < 4 || p2.y - p1.y < 4) return;
+
+      crop = { x: p1.x, y: p1.y, w: p2.x - p1.x, h: p2.y - p1.y };
+      cropInfo.innerHTML = `Region: <span>(${crop.x}, ${crop.y})</span> → <span>(${crop.x + crop.w}, ${crop.y + crop.h})</span> &nbsp;·&nbsp; <span>${crop.w} × ${crop.h} px</span>`;
+      applyBtn.disabled = false;
+      resetBtn.disabled = false;
+      drawPreview();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      crop = null;
+      applyBtn.disabled = true;
+      resetBtn.disabled = true;
+      cropInfo.textContent = 'No region selected — click and drag to draw one';
+      drawPreview();
+    });
+
+    applyBtn.addEventListener('click', async () => {
+      if (!crop) return;
+      applyBtn.disabled = true;
+      resetBtn.disabled = true;
+
+      const wrap    = document.getElementById('progressWrap');
+      const bar     = document.getElementById('progressBar');
+      const label   = document.getElementById('progressLabel');
+      const msg     = document.getElementById('statusMsg');
+      wrap.style.display = 'block';
+
+      const zip = new JSZip();
+
+      for (let i = 0; i < files.length; i++) {
+        label.textContent = `Cropping ${i + 1} / ${files.length}…`;
+        bar.style.width = ((i + 1) / files.length * 100) + '%';
+        msg.textContent = files[i].name;
+
+        const img = images[i];
+        await new Promise(r => { if (img.complete) r(); else img.onload = r; });
+
+        const x = Math.min(crop.x, img.naturalWidth);
+        const y = Math.min(crop.y, img.naturalHeight);
+        const w = Math.min(crop.w, img.naturalWidth  - x);
+        const h = Math.min(crop.h, img.naturalHeight - y);
+
+        const off = new OffscreenCanvas(w, h);
+        const octx = off.getContext('2d');
+        octx.drawImage(img, -x, -y);
+
+        const blob = await off.convertToBlob({ type: 'image/png' });
+        zip.file(files[i].name.replace(/\.[^.]+$/, '.png'), blob);
+
+        // small yield to keep UI responsive
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      label.textContent = 'Building ZIP…';
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = 'cropped.zip';
+      a.click();
+
+      label.textContent = `Done — ${files.length} images cropped`;
+      msg.textContent = '';
+      applyBtn.disabled = false;
+      resetBtn.disabled = false;
+    });
+
+    window.addEventListener('resize', () => { if (images[activeIdx]) drawPreview(); });
+  </script>
+</body>
+</html>
